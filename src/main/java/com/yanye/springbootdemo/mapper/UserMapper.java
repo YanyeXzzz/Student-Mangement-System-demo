@@ -34,4 +34,7 @@ public interface UserMapper {
 
     @Update("update student set id=#{student.id},username=#{student.username},age=#{student.age},sex=#{student.sex},class_name=#{student.className},update_time=now() where id=#{oldId}")
     void updateStu(Student student,String oldId);
+
+    @Update("update user set password=#{newPassword},update_time=now() where username=#{username}")
+    void updatePwd(String username,String newPassword);
 }

@@ -22,4 +22,6 @@ public interface UserService {
     Student findStuById(String id);
 
     void updateStu(Student student,String oldId);
+
+    void updatePwd(String username,String password);
 }
