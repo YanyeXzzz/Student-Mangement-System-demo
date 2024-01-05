@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息管理系统</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../node_modules/element-ui/lib/theme-default/index.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f1f1;
+            overflow: hidden;
+        }
+
+        .container {
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            width: 100%;
+            height: 800px;
+        }
+
+
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .sidebar {
+            width: 150px;
+        }
+
+
+
+        .sidebar a:hover {
+            background-color: #45a049;
+        }
+
+        .content {
+            width: 85%;
+            position: absolute;
+            left: 10%;
+            top: 12%;
+        }
+
+        .test {
+            width: 50px;
+            height: 30px;
+            background-color: red;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            font-size: 12px;
+            transform: translateX(-150%);
+        }
+
+        .btn-d {
+            width: 10px;
+            display: flex;
+        }
+
+        .btn-edit {
+            background-color: rgb(84, 156, 180);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #EFF2F7;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <header>
+            <h3>学生信息管理系统</h3>
+            <el-menu class="el-menu-demo" mode="horizontal">
+                <el-menu-item index="1">处理中心</el-menu-item>
+                <el-menu-item index="2">订单管理</el-menu-item>
+                <el-submenu index="3">
+                    <template slot="title">我的</template>
+                    <el-menu-item index="2-1">我的信息</el-menu-item>
+                    <el-menu-item index="2-2" @click="exitlogin()">退出登录</el-menu-item>
+                    <el-menu-item index="2-3">修改密码</el-menu-item>
+                </el-submenu>
+            </el-menu>
+        </header>
+
+        <div class="sidebar">
+            <el-menu default-active="2" class="el-menu-vertical-demo">
+                <el-menu-item index="1" @click="dialogFormVisible = true"><i
+                        class="el-icon-menu"></i>添加学生</el-menu-item>
+                <el-menu-item index="2" @click="query()"><i class="el-icon-menu"></i>查询</el-menu-item>
+            </el-menu>
+        </div>
+
+        <div class="content">
+            <el-table :data="students" stripe style="width: 100%">
+                <el-table-column prop="id" label="学号" width="180">
+                </el-table-column>
+                <el-table-column prop="username" label="姓名" width="180">
+                </el-table-column>
+                <el-table-column prop="age" label="年龄">
+                </el-table-column>
+                <el-table-column prop="sex" label="性别">
+                </el-table-column>
+                <el-table-column prop="className" label="班级">
+                </el-table-column>
+                <el-table-column>
+                    <template slot-scope="scope">
+                        <el-button type="primary" icon="edit"
+                            @click="getStudentId(scope.$index);dialogFormVisible_update = true"></el-button>
+                        <el-button type="danger" icon="delete" @click="deleteStudent(scope.$index)"></el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <el-dialog title="添加学生" :visible.sync="dialogFormVisible">
+            <el-form :model="form">
+                <el-form-item label="学号" :label-width="formLabelWidth">
+                    <el-input v-model="form.id" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" :label-width="formLabelWidth">
+                    <el-input v-model="form.username" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" :label-width="formLabelWidth">
+                    <el-input v-model="form.sex" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="年龄" :label-width="formLabelWidth">
+                    <el-input v-model="form.age" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="班级" :label-width="formLabelWidth">
+                    <el-input v-model="form.className" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addStudent();dialogFormVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="修改学生" :visible.sync="dialogFormVisible_update">
+            <el-form :model="form">
+                <el-form-item label="学号" :label-width="formLabelWidth">
+                    <el-input v-model="form.id" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" :label-width="formLabelWidth">
+                    <el-input v-model="form.username" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" :label-width="formLabelWidth">
+                    <el-input v-model="form.sex" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="年龄" :label-width="formLabelWidth">
+                    <el-input v-model="form.age" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="班级" :label-width="formLabelWidth">
+                    <el-input v-model="form.className" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible_update = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible_update = false;uptateStudent()">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+
+    <script src="../vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../node_modules/element-ui/lib/index.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                students: [
+
+                ],
+                form: {
+
+                },
+                dialogFormVisible: false,
+                dialogFormVisible_update: false,
+                formLabelWidth: '80px',
+                scopeIndex: '',
+                loginUser: ''
+            },
+            methods: {
+                query() {
+                    this.students.length = 0
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('Get', 'http://10.180.54.129:9090/get', false)
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                // this.$message({
+                                //     message: '查询成功',
+                                //     type: 'success'
+                                // })
+                                for (let i = 0; i < jsonRes.data.length; i++) {
+                                    this.students.push(jsonRes.data[i]); // 将jsonRes.data添加到students数组中
+                                }
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send();
+                },
+
+                exitlogin() {
+                    this.$confirm('此操作将注销登录, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        sessionStorage.setItem('username','')
+                        this.$message({
+                            type: 'success',
+                            message: '成功!'
+                        });
+                        window.location.replace('login.html')
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                },
+
+                addStudent() {
+                    const xhr = new XMLHttpRequest()
+
+                    const student = JSON.stringify(this.form)
+                    xhr.open('POST', 'http://10.180.54.129:9090/add', false)
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.$message({
+                                    message: '添加成功!',
+                                    type: 'success'
+                                });
+                                this.query()
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send(student);
+                },
+
+                deleteStudent(index) {
+                    this.$confirm('此操作将删除该学生, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        const sid = this.students[index].id
+                        const xhr = new XMLHttpRequest()
+                        xhr.open('DELETE', 'http://10.180.54.129:9090/delete', false)
+                        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                        xhr.onreadystatechange = () => {
+                            if (xhr.readyState == 4 && xhr.status == 200) {
+                                const jsonRes = JSON.parse(xhr.responseText)
+                                if (jsonRes.code === 0) {
+                                    this.$message({
+                                        message: '删除成功!',
+                                        type: 'success'
+                                    });
+                                    this.query()
+                                } else {
+                                    this.$message({
+                                        message: jsonRes.message,
+                                        type: 'error'
+                                    })
+                                }
+                            }
+                        };
+                        xhr.send("id=" + sid);
+
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                },
+
+                getStudentId(index) {
+                    const student = JSON.stringify(this.students[index])
+                    this.scopeIndex = JSON.parse(student).id
+                    this.form = this.students[index]
+                },
+
+                uptateStudent() {
+                    const stu_old_id = this.scopeIndex
+
+                    const update_stu = JSON.stringify(this.form)
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('PUT', 'http://10.180.54.129:9090?oldId=' + stu_old_id, false)
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.$message({
+                                    message: '修改成功!',
+                                    type: 'success'
+                                });
+                                this.query()
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send(update_stu);
+                },
+
+            },
+            // created钩子函数 实例创建完成后执行
+            created() {
+                loginUser = sessionStorage.getItem('username');
+                if(loginUser == '' || loginUser == null){
+                    this.$message({
+                    message: '请先登录',
+                    type: 'error'
+                    });
+                    setTimeout(function(){
+                        window.location.replace('login.html')
+                    },1500)
+                }else{
+                    this.$message({
+                    message: '欢迎您' + loginUser,
+                    type: 'info'
+                    });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

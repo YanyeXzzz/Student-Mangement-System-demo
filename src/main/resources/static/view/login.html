@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+
+    <!-- 引入样式 -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui@1.4/lib/theme-default/index.css"> -->
+
+    <link rel="stylesheet" href="../node_modules/element-ui/lib/theme-default/index.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 7px;
+            font-size: 14px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 3px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .form-group a {
+            display: block;
+            width: 90%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 3px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+
+        .p {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <h2>登录</h2>
+        <form>
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" placeholder="请输入用户名" v-model="username">
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码" v-model="password">
+            </div>
+            <div class="form-group">
+                <a id="btn" @click="login()">登录</a>
+            </div>
+        </form>
+        <p class="p"><a href="register.html">没有账号？立即注册 ></a></p>
+    </div>
+
+
+
+    <script src="../vue.js"></script>
+
+    <!-- 引入组件库 -->
+    <!-- <script src="https://unpkg.com/element-ui@1.4/lib/index.js"></script> -->
+
+    <script src="../node_modules/element-ui/lib/index.js"></script>
+
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                username: '',
+                password: ''
+            },
+            methods: {
+                login() {
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('POST', 'http://10.180.54.129:9090/login', false)
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.$message({
+                                    message: '登录成功!',
+                                    type: 'success'
+                                });
+                                sessionStorage.setItem('username', this.username);
+                                setTimeout(function () {
+                                    // 延时执行的代码
+                                    window.location.replace('main.html')
+                                }, 1000); // 延时1秒后执行 
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+
+                    xhr.send("username=" + this.username + "&password=" + this.password);
+                }
+            }
+        })
+
+
+    </script>
+</body>
+
+</html>
