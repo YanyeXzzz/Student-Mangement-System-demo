@@ -129,7 +129,7 @@
                     <template slot="title">我的</template>
                     <el-menu-item index="2-1">我的信息</el-menu-item>
                     <el-menu-item index="2-2" @click="exitlogin()">退出登录</el-menu-item>
-                    <el-menu-item index="2-3">修改密码</el-menu-item>
+                    <el-menu-item index="2-3" @click="dialogFormVisible_updatePwd = true">修改密码</el-menu-item>
                 </el-submenu>
             </el-menu>
         </header>
@@ -207,7 +207,22 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible_update = false">取 消</el-button>
-                <el-button type="primary" @click="dialogFormVisible_update = false;uptateStudent()">确 定</el-button>
+                <el-button type="primary" @click="dialogFormVisible_update = false;updateStudent()">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="修改密码" :visible.sync="dialogFormVisible_updatePwd">
+            <el-form :model="form_data_user">
+                <el-form-item label="密码" :label-width="formLabelWidth">
+                    <el-input v-model="form_data_user.oldPassword" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" :label-width="formLabelWidth">
+                    <el-input v-model="form_data_user.newPassword" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible_updatePwd = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible_updatePwd = false;updatePwd()">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -226,8 +241,13 @@
                 form: {
 
                 },
+                form_data_user:{
+                    oldPassword:'',
+                    newPassword:''
+                },
                 dialogFormVisible: false,
                 dialogFormVisible_update: false,
+                dialogFormVisible_updatePwd: false,
                 formLabelWidth: '80px',
                 scopeIndex: '',
                 loginUser: ''
@@ -348,7 +368,7 @@
                     this.form = this.students[index]
                 },
 
-                uptateStudent() {
+                updateStudent() {
                     const stu_old_id = this.scopeIndex
 
                     const update_stu = JSON.stringify(this.form)
@@ -373,6 +393,33 @@
                         }
                     };
                     xhr.send(update_stu);
+                },
+                updatePwd() {
+                    const username = sessionStorage.getItem("username");
+                    const oldPassword = this.form_data_user.oldPassword;
+                    const newPassword = this.form_data_user.newPassword;
+
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('PATCH', 'http://10.180.54.129:9090', false)
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.$message({
+                                    message: '修改成功!',
+                                    type: 'success'
+                                });
+                                this.query()
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send("username=" + username + "&oldPassword=" + oldPassword + "&newPassword=" + newPassword);
                 },
 
             },

@@ -54,4 +54,9 @@ public class UserServiceImpl implements UserService {
     public void updateStu(Student student,String oldId) {
         userMapper.updateStu(student,oldId);
     }
+
+    @Override
+    public void updatePwd(String username,String password) {
+        userMapper.updatePwd(username,password);
+    }
 }

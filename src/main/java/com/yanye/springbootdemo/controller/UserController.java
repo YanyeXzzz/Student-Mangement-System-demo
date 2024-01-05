@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping
@@ -77,5 +78,19 @@ public class UserController {
     public Result updateStu(@RequestBody Student student ,@RequestParam String oldId){
         userService.updateStu(student,oldId);
         return Result.success("修改成功！");
+    }
+
+    @PatchMapping
+    public Result updatePwd(@RequestParam String username,String oldPassword,String newPassword) {
+        User u = userService.findUserByName(username);
+        Result result = login(username, oldPassword);
+        if (u == null) {
+            return Result.error("用户不存在");
+        } else if (result.getCode() == 0) {
+            userService.updatePwd(username,newPassword);
+        }else{
+            return result;
+        }
+        return Result.success("密码修改成功");
     }
 }
