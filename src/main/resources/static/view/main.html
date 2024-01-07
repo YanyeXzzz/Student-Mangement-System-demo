@@ -52,24 +52,7 @@
             background-color: #f9f9f9;
         }
 
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
 
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
 
         .sidebar {
             width: 150px;
@@ -82,38 +65,21 @@
         }
 
         .content {
-            width: 85%;
-            position: absolute;
-            left: 10%;
-            top: 12%;
+            width: 95%;
+
         }
 
-        .test {
-            width: 50px;
-            height: 30px;
-            background-color: red;
-            border-radius: 5px;
-            color: white;
-            text-align: center;
-            line-height: 30px;
-            font-size: 12px;
-            transform: translateX(-150%);
-        }
-
-        .btn-d {
-            width: 10px;
-            display: flex;
-        }
-
-        .btn-edit {
-            background-color: rgb(84, 156, 180);
-        }
 
         header {
             display: flex;
             justify-content: space-around;
             align-items: center;
             background-color: #EFF2F7;
+        }
+
+        .box-content {
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -134,35 +100,51 @@
             </el-menu>
         </header>
 
-        <div class="sidebar">
-            <el-menu default-active="2" class="el-menu-vertical-demo">
-                <el-menu-item index="1" @click="dialogFormVisible = true"><i
-                        class="el-icon-menu"></i>添加学生</el-menu-item>
-                <el-menu-item index="2" @click="query()"><i class="el-icon-menu"></i>查询</el-menu-item>
-            </el-menu>
+
+        <div class="box-content">
+            <div class="sidebar">
+                <el-menu default-active="1" class="el-menu-vertical-demo">
+
+                </el-menu>
+                <el-menu default-active="2" >
+                    <el-submenu index="1">
+                        <template slot="title"><i class="el-icon-message"></i>学生管理</template>
+                        <el-menu-item-group>
+                            <el-menu-item index="1-1" @click="dialogFormVisible = true"><i
+                                    class="el-icon-menu"></i>添加学生</el-menu-item>
+                            <el-menu-item index="1-2" @click="query()"><i class="el-icon-menu"></i>学生信息</el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
+                    <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
+                    <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
+                </el-menu>
+            </div>
+            <!--  内容区-->
+            <div class="content">
+                <el-table :data="students" stripe style="width: 100%">
+                    <el-table-column prop="id" label="学号" width="180">
+                    </el-table-column>
+                    <el-table-column prop="username" label="姓名" width="180">
+                    </el-table-column>
+                    <el-table-column prop="age" label="年龄">
+                    </el-table-column>
+                    <el-table-column prop="sex" label="性别">
+                    </el-table-column>
+                    <el-table-column prop="className" label="班级">
+                    </el-table-column>
+                    <el-table-column>
+                        <template slot-scope="scope">
+                            <el-button type="primary" icon="edit"
+                                       @click="getStudentId(scope.$index);dialogFormVisible_update = true"></el-button>
+                            <el-button type="danger" icon="delete" @click="deleteStudent(scope.$index)"></el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
         </div>
 
-        <div class="content">
-            <el-table :data="students" stripe style="width: 100%">
-                <el-table-column prop="id" label="学号" width="180">
-                </el-table-column>
-                <el-table-column prop="username" label="姓名" width="180">
-                </el-table-column>
-                <el-table-column prop="age" label="年龄">
-                </el-table-column>
-                <el-table-column prop="sex" label="性别">
-                </el-table-column>
-                <el-table-column prop="className" label="班级">
-                </el-table-column>
-                <el-table-column>
-                    <template slot-scope="scope">
-                        <el-button type="primary" icon="edit"
-                            @click="getStudentId(scope.$index);dialogFormVisible_update = true"></el-button>
-                        <el-button type="danger" icon="delete" @click="deleteStudent(scope.$index)"></el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </div>
+
+
         <el-dialog title="添加学生" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="学号" :label-width="formLabelWidth">
@@ -232,19 +214,18 @@
     <!-- 引入组件库 -->
     <script src="../node_modules/element-ui/lib/index.js"></script>
     <script>
-        var app = new Vue({
+        const app = new Vue({
             el: '#app',
             data: {
-                students: [
+                students: [],
 
-                ],
-                form: {
+                form: {},
 
+                form_data_user: {
+                    oldPassword: '',
+                    newPassword: ''
                 },
-                form_data_user:{
-                    oldPassword:'',
-                    newPassword:''
-                },
+
                 dialogFormVisible: false,
                 dialogFormVisible_update: false,
                 dialogFormVisible_updatePwd: false,
@@ -256,7 +237,7 @@
                 query() {
                     this.students.length = 0
                     const xhr = new XMLHttpRequest()
-                    xhr.open('Get', 'http://10.180.54.129:9090/get', false)
+                    xhr.open('Get', 'http://10.1.8.125:9090/get', false)
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
                             const jsonRes = JSON.parse(xhr.responseText)
@@ -285,7 +266,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        sessionStorage.setItem('username','')
+                        sessionStorage.setItem('username', '')
                         this.$message({
                             type: 'success',
                             message: '成功!'
@@ -303,7 +284,7 @@
                     const xhr = new XMLHttpRequest()
 
                     const student = JSON.stringify(this.form)
-                    xhr.open('POST', 'http://10.180.54.129:9090/add', false)
+                    xhr.open('POST', 'http://10.1.8.125:9090/add', false)
                     xhr.setRequestHeader('Content-Type', 'application/json')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -333,7 +314,7 @@
                     }).then(() => {
                         const sid = this.students[index].id
                         const xhr = new XMLHttpRequest()
-                        xhr.open('DELETE', 'http://10.180.54.129:9090/delete', false)
+                        xhr.open('DELETE', 'http://10.1.8.125:9090/delete', false)
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                         xhr.onreadystatechange = () => {
                             if (xhr.readyState == 4 && xhr.status == 200) {
@@ -373,7 +354,7 @@
 
                     const update_stu = JSON.stringify(this.form)
                     const xhr = new XMLHttpRequest()
-                    xhr.open('PUT', 'http://10.180.54.129:9090?oldId=' + stu_old_id, false)
+                    xhr.open('PUT', 'http://10.1.8.125:9090?oldId=' + stu_old_id, false)
                     xhr.setRequestHeader('Content-Type', 'application/json')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -394,13 +375,14 @@
                     };
                     xhr.send(update_stu);
                 },
+
                 updatePwd() {
                     const username = sessionStorage.getItem("username");
                     const oldPassword = this.form_data_user.oldPassword;
                     const newPassword = this.form_data_user.newPassword;
 
                     const xhr = new XMLHttpRequest()
-                    xhr.open('PATCH', 'http://10.180.54.129:9090', false)
+                    xhr.open('PATCH', 'http://10.1.8.125:9090', false)
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -425,23 +407,24 @@
             },
             // created钩子函数 实例创建完成后执行
             created() {
+                this.query()
                 loginUser = sessionStorage.getItem('username');
-                if(loginUser == '' || loginUser == null){
+                if (loginUser == '' || loginUser == null) {
                     this.$message({
-                    message: '请先登录',
-                    type: 'error'
+                        message: '请先登录',
+                        type: 'error'
                     });
-                    setTimeout(function(){
+                    setTimeout(function () {
                         window.location.replace('login.html')
-                    },1500)
-                }else{
+                    }, 1500)
+                } else {
                     this.$message({
-                    message: '欢迎您' + loginUser,
-                    type: 'info'
+                        message: '欢迎您' + loginUser,
+                        type: 'info'
                     });
                 }
             }
-        })
+        });
     </script>
 </body>
 
