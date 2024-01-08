@@ -11,8 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f1f1f1;
-            overflow: hidden;
+
         }
 
         .container {
@@ -81,6 +80,14 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .page-box {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -121,7 +128,7 @@
             </div>
             <!--  内容区-->
             <div class="content">
-                <el-table :data="students" stripe style="width: 100%">
+                <el-table :data="students" stripe style="width: 100%" highlight-current-row>
                     <el-table-column prop="id" label="学号" width="180">
                     </el-table-column>
                     <el-table-column prop="username" label="姓名" width="180">
@@ -142,6 +149,21 @@
                 </el-table>
             </div>
         </div>
+        <div class="page-box">
+            <div class="block">
+                <span class="demonstration"></span>
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage4"
+                        :page-sizes="[5, 10, 15, 20]"
+                        :page-size="5"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="20">
+                </el-pagination>
+            </div>
+        </div>
+
 
 
 
@@ -218,7 +240,6 @@
             el: '#app',
             data: {
                 students: [],
-
                 form: {},
 
                 form_data_user: {
@@ -231,21 +252,27 @@
                 dialogFormVisible_updatePwd: false,
                 formLabelWidth: '80px',
                 scopeIndex: '',
-                loginUser: ''
+                loginUser: '',
+                currentPage4: 1
             },
             methods: {
-                query() {
+                //切换pageSize时触发
+                handleSizeChange(val) {
+
+                },
+                //切换currentPage时触发
+                handleCurrentChange(val) {
+
+                },
+
+                query(val) {
                     this.students.length = 0
                     const xhr = new XMLHttpRequest()
-                    xhr.open('Get', 'http://10.1.8.125:9090/get', false)
+                    xhr.open('Get', 'http://localhost:9090/get', false)
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
                             const jsonRes = JSON.parse(xhr.responseText)
                             if (jsonRes.code === 0) {
-                                // this.$message({
-                                //     message: '查询成功',
-                                //     type: 'success'
-                                // })
                                 for (let i = 0; i < jsonRes.data.length; i++) {
                                     this.students.push(jsonRes.data[i]); // 将jsonRes.data添加到students数组中
                                 }
@@ -284,7 +311,7 @@
                     const xhr = new XMLHttpRequest()
 
                     const student = JSON.stringify(this.form)
-                    xhr.open('POST', 'http://10.1.8.125:9090/add', false)
+                    xhr.open('POST', 'http://localhost:9090/add', false)
                     xhr.setRequestHeader('Content-Type', 'application/json')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -314,7 +341,7 @@
                     }).then(() => {
                         const sid = this.students[index].id
                         const xhr = new XMLHttpRequest()
-                        xhr.open('DELETE', 'http://10.1.8.125:9090/delete', false)
+                        xhr.open('DELETE', 'http://localhost:9090/delete', false)
                         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                         xhr.onreadystatechange = () => {
                             if (xhr.readyState == 4 && xhr.status == 200) {
@@ -354,7 +381,7 @@
 
                     const update_stu = JSON.stringify(this.form)
                     const xhr = new XMLHttpRequest()
-                    xhr.open('PUT', 'http://10.1.8.125:9090?oldId=' + stu_old_id, false)
+                    xhr.open('PUT', 'http://localhost:9090?oldId=' + stu_old_id, false)
                     xhr.setRequestHeader('Content-Type', 'application/json')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -381,8 +408,8 @@
                     const oldPassword = this.form_data_user.oldPassword;
                     const newPassword = this.form_data_user.newPassword;
 
-                    const xhr = new XMLHttpRequest()
-                    xhr.open('PATCH', 'http://10.1.8.125:9090', false)
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('PATCH', 'http://localhost:9090', false)
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -392,13 +419,18 @@
                                     message: '修改成功!',
                                     type: 'success'
                                 });
-                                this.query()
                             } else {
                                 this.$message({
                                     message: jsonRes.message,
                                     type: 'error'
                                 })
                             }
+                        }
+                        else{
+                            this.$message({
+                                message: '服务异常',
+                                type: 'error'
+                            })
                         }
                     };
                     xhr.send("username=" + username + "&oldPassword=" + oldPassword + "&newPassword=" + newPassword);

@@ -161,13 +161,13 @@
                         return
                     }
                     const xhr = new XMLHttpRequest()
-                    xhr.open('POST', 'http://10.1.8.125:9090/register', false)
+                    xhr.open('POST', 'http://localhost:9090/register', false)
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
                             const jsonRes = JSON.parse(xhr.responseText)
-                            this.loading = true
                             if (jsonRes.code === 0) {
+                                this.loading = true
                                 this.$message({
                                     message: '注册成功!',
                                     type: 'success'
@@ -182,6 +182,12 @@
                                     type: 'error'
                                 })
                             }
+                        }
+                        else{
+                            this.$message({
+                                message: '服务异常',
+                                type: 'error'
+                            })
                         }
                     };
 

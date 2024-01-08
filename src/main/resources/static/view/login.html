@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <title>登录</title>
 
-    <!-- 引入样式 -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui@1.4/lib/theme-default/index.css"> -->
-
     <link rel="stylesheet" href="../node_modules/element-ui/lib/theme-default/index.css">
     <style>
         body {
@@ -168,7 +165,7 @@
                 login() {
 
                     const xhr = new XMLHttpRequest()
-                    xhr.open('POST', 'http://10.1.8.125:9090/login', false)
+                    xhr.open('POST', 'http://localhost:9090/login', false)
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -190,6 +187,12 @@
                                     type: 'error'
                                 })
                             }
+                        }
+                        else{
+                            this.$message({
+                                message: '服务异常',
+                                type: 'error'
+                            })
                         }
                     };
 
