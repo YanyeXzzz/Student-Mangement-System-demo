@@ -1,1 +1,1 @@
-一个基于springboot+vue2的学生信息管理系统
+![img_4.png](img_4.png)
