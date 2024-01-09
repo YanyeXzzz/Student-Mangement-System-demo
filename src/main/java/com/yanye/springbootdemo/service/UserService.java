@@ -1,6 +1,7 @@
 package com.yanye.springbootdemo.service;
 
 
+import com.yanye.springbootdemo.pojo.Page;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
 
@@ -24,4 +25,8 @@ public interface UserService {
     void updateStu(Student student,String oldId);
 
     void updatePwd(String username,String password);
+
+    List<Student> select(String username, String id);
+
+    List<Student> selectWithPage(Page page);
 }

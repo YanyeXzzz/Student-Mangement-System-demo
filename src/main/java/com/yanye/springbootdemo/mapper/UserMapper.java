@@ -1,6 +1,7 @@
 package com.yanye.springbootdemo.mapper;
 
 
+import com.yanye.springbootdemo.pojo.Page;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
 import org.apache.ibatis.annotations.*;
@@ -37,4 +38,10 @@ public interface UserMapper {
 
     @Update("update user set password=#{newPassword},update_time=now() where username=#{username}")
     void updatePwd(String username,String newPassword);
+
+    @Select("select * from student where username=#{username} or id=#{id}")
+    List<Student> select(String username, String id);
+
+    @Select("select * from student limit #{startIndex},#{pageSize}")
+    List<Student> selectWithPage(Integer startIndex,Integer pageSize);
 }

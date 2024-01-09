@@ -1,6 +1,7 @@
 package com.yanye.springbootdemo.service.imple;
 
 import com.yanye.springbootdemo.mapper.UserMapper;
+import com.yanye.springbootdemo.pojo.Page;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
 import com.yanye.springbootdemo.service.UserService;
@@ -58,5 +59,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePwd(String username,String password) {
         userMapper.updatePwd(username,password);
+    }
+
+    @Override
+    public List<Student> select(String username, String id) {
+        return userMapper.select(username,id);
+    }
+
+    @Override
+    public List<Student> selectWithPage(Page page) {
+        Integer pageNo = page.getPageNumber();
+        Integer pageSize = page.getPageSize();
+
+        Integer startIndex = (pageNo-1) * pageSize;
+        return userMapper.selectWithPage(startIndex,pageSize);
     }
 }

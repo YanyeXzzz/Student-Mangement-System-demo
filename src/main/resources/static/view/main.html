@@ -15,15 +15,9 @@
         }
 
         .container {
-            padding: 20px;
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
             width: 100%;
-            height: 800px;
         }
-
-
 
         h1 {
             text-align: center;
@@ -55,6 +49,7 @@
 
         .sidebar {
             width: 150px;
+            overflow: hidden;
         }
 
 
@@ -64,8 +59,8 @@
         }
 
         .content {
-            width: 95%;
-
+            width: 92%;
+            margin-top: 20px;
         }
 
 
@@ -128,6 +123,25 @@
             </div>
             <!--  内容区-->
             <div class="content">
+                <el-form :inline="true" class="demo-form-inline" :model="query_data">
+                    <el-form-item label="学号">
+                        <el-input placeholder="学号" v-model="query_data.id"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名">
+                        <el-input placeholder="姓名" v-model="query_data.username"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="select">查询</el-button>
+                    </el-form-item>
+                    <el-form-item label="模糊查询">
+                        <el-switch
+                                v-model="select_data.value1"
+                                on-text=""
+                                off-text="">
+                        </el-switch>
+                    </el-form-item>
+
+                </el-form>
                 <el-table :data="students" stripe style="width: 100%" highlight-current-row>
                     <el-table-column prop="id" label="学号" width="180">
                     </el-table-column>
@@ -149,23 +163,21 @@
                 </el-table>
             </div>
         </div>
+
         <div class="page-box">
             <div class="block">
                 <span class="demonstration"></span>
                 <el-pagination
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
-                        :current-page="currentPage4"
+                        :current-page="page.currentPage"
                         :page-sizes="[5, 10, 15, 20]"
-                        :page-size="5"
+                        :page-size="page.pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
-                        :total="20">
+                        :total="page.total">
                 </el-pagination>
             </div>
         </div>
-
-
-
 
         <el-dialog title="添加学生" :visible.sync="dialogFormVisible">
             <el-form :model="form">
@@ -239,33 +251,70 @@
         const app = new Vue({
             el: '#app',
             data: {
+                //显示学生的信息
                 students: [],
+
+                //添加学生绑定的数据
                 form: {},
 
+                //模糊查询开关
+                select_data: {
+                    value1: false
+                },
+
+                //修改用户密码
                 form_data_user: {
                     oldPassword: '',
                     newPassword: ''
                 },
 
+                //按条件查询学生的数据
+                query_data: {
+                    id: '',
+                    username: ''
+                },
+
+                //添加学生对话框的显示状态
                 dialogFormVisible: false,
+                //修改学生对话框的显示状态
                 dialogFormVisible_update: false,
+                //修改密码对话框的显示状态
                 dialogFormVisible_updatePwd: false,
+
                 formLabelWidth: '80px',
+
+                //学生表数据中的当前行
                 scopeIndex: '',
+
+                //当前登录的用户
                 loginUser: '',
-                currentPage4: 1
+
+                //分页查询的数据
+                page: {
+                    currentPage: 1,
+                    pageNo: 1,
+                    pageSize: 5,
+                    total: '0'
+                }
+
             },
             methods: {
                 //切换pageSize时触发
                 handleSizeChange(val) {
-
+                    if (val == null) {
+                        val = 5
+                    }
+                    this.page.pageSize = val
+                    this.selectWithPage()
                 },
                 //切换currentPage时触发
                 handleCurrentChange(val) {
-
+                    this.page.currentPage = val
+                    this.selectWithPage()
                 },
 
-                query(val) {
+                //查询所有
+                query() {
                     this.students.length = 0
                     const xhr = new XMLHttpRequest()
                     xhr.open('Get', 'http://localhost:9090/get', false)
@@ -276,6 +325,7 @@
                                 for (let i = 0; i < jsonRes.data.length; i++) {
                                     this.students.push(jsonRes.data[i]); // 将jsonRes.data添加到students数组中
                                 }
+                                this.page.total = this.students.length
                             } else {
                                 this.$message({
                                     message: jsonRes.message,
@@ -436,12 +486,73 @@
                     xhr.send("username=" + username + "&oldPassword=" + oldPassword + "&newPassword=" + newPassword);
                 },
 
+                //条件查询
+                select(){
+                    const xhr = new XMLHttpRequest()
+                    const id = this.query_data.id;
+                    const username = this.query_data.username;
+                    if (id === '' && username === '') {
+                        this.query()
+                        this.$message({
+                            message: '查询成功!',
+                            type: 'success'
+                        })
+                        return
+                    }
+                    xhr.open('GET', 'http://localhost:9090/select?username=' + username + '&id=' + id, false);
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.$message({
+                                    message: '查询成功!',
+                                    type: 'success'
+                                })
+                                this.students.length = 0
+                                for (let i = 0; i < jsonRes.data.length; i++) {
+                                    this.students.push(jsonRes.data[i])
+                                }
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send();
+                },
+
+                //分页查询
+                selectWithPage() {
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('GET', 'http://localhost:9090/select_with_page?pageNo=' + this.page.currentPage + '&pageSize=' + this.page.pageSize, false);
+                    xhr.onreadystatechange = () => {
+                        if (xhr.readyState == 4 && xhr.status == 200) {
+                            const jsonRes = JSON.parse(xhr.responseText)
+                            if (jsonRes.code === 0) {
+                                this.students.length = 0
+                                this.students = jsonRes.data
+                            } else {
+                                this.$message({
+                                    message: jsonRes.message,
+                                    type: 'error'
+                                })
+                            }
+                        }
+                    };
+                    xhr.send();
+                },
+
             },
             // created钩子函数 实例创建完成后执行
             created() {
+                //在分页查询前获取page.total
                 this.query()
+                //在分页查询前初始化pageSize和currentPage
+                this.selectWithPage()
                 loginUser = sessionStorage.getItem('username');
-                if (loginUser == '' || loginUser == null) {
+                if (loginUser === '' || loginUser == null) {
                     this.$message({
                         message: '请先登录',
                         type: 'error'

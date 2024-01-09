@@ -1,5 +1,6 @@
 package com.yanye.springbootdemo.controller;
 
+import com.yanye.springbootdemo.pojo.Page;
 import com.yanye.springbootdemo.pojo.Result;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
@@ -91,5 +92,21 @@ public class UserController {
             return result;
         }
         return Result.success("密码修改成功");
+    }
+
+    @GetMapping("/select")
+    public Result select(@RequestParam String username,String id) {
+        List<Student> list = userService.select(username, id);
+        if (list.isEmpty()){
+            return Result.error("找不到用户");
+        }
+        return Result.success(list);
+    }
+
+    @GetMapping("/select_with_page")
+    public Result selectWithPage(@RequestParam Integer pageNo,Integer pageSize){
+        Page page = new Page(pageNo, pageSize);
+        List<Student> students = userService.selectWithPage(page);
+        return Result.success(students);
     }
 }
