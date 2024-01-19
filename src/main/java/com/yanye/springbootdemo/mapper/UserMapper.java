@@ -1,7 +1,6 @@
 package com.yanye.springbootdemo.mapper;
 
 
-import com.yanye.springbootdemo.pojo.Page;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
 import org.apache.ibatis.annotations.*;
@@ -44,4 +43,7 @@ public interface UserMapper {
 
     @Select("select * from student limit #{startIndex},#{pageSize}")
     List<Student> selectWithPage(Integer startIndex,Integer pageSize);
+
+    @Select("select count(*) from student")
+    Integer getPageTotal();
 }

@@ -70,8 +70,13 @@ public class UserServiceImpl implements UserService {
     public List<Student> selectWithPage(Page page) {
         Integer pageNo = page.getPageNumber();
         Integer pageSize = page.getPageSize();
-
         Integer startIndex = (pageNo-1) * pageSize;
+
         return userMapper.selectWithPage(startIndex,pageSize);
+    }
+
+    @Override
+    public Integer getPageTotal() {
+        return userMapper.getPageTotal();
     }
 }

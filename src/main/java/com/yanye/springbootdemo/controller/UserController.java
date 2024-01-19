@@ -109,4 +109,12 @@ public class UserController {
         List<Student> students = userService.selectWithPage(page);
         return Result.success(students);
     }
+
+    @GetMapping("/getTotal")
+    public Result getPageTotal() {
+        Integer pageTotal = userService.getPageTotal();
+        return Result.success(pageTotal);
+    }
+
+
 }

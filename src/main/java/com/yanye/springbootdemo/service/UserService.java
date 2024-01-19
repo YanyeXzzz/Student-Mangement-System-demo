@@ -29,4 +29,6 @@ public interface UserService {
     List<Student> select(String username, String id);
 
     List<Student> selectWithPage(Page page);
+
+    Integer getPageTotal();
 }
