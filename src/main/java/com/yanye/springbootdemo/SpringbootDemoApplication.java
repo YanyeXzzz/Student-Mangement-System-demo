@@ -8,10 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SpringbootDemoApplication {
 
     public static void main(String[] args) {
-        //启动项目前获取本地局域网ip
-        GetLocalAddr getLocalAddr = new GetLocalAddr();
-        getLocalAddr.getLocalIpAddress("src/main/resources/static/text/ipAddress.text");
-
         SpringApplication.run(SpringbootDemoApplication.class, args);
     }
 
