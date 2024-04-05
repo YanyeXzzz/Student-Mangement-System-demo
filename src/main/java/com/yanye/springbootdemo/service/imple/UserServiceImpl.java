@@ -1,13 +1,11 @@
 package com.yanye.springbootdemo.service.imple;
 
 import com.yanye.springbootdemo.mapper.UserMapper;
-import com.yanye.springbootdemo.pojo.Page;
-import com.yanye.springbootdemo.pojo.Student;
-import com.yanye.springbootdemo.pojo.User;
+import com.yanye.springbootdemo.pojo.*;
 import com.yanye.springbootdemo.service.UserService;
+import com.yanye.springbootdemo.util.SpiderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -78,5 +76,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer getPageTotal() {
         return userMapper.getPageTotal();
+    }
+
+
+    /**
+     * 保存歌曲
+     * @param song 歌曲信息
+     * @return 0-成功 -1-失败
+     */
+    @Override
+    public Integer saveMusic(Song song) {
+        String url = "http://music.163.com/song/media/outer/url?id=" + song.getSongId();
+        String path = "src/main/resources/songs/" + song.getSongName() + ".mp3";
+        return SpiderUtil.saveSongs(url, path);
     }
 }

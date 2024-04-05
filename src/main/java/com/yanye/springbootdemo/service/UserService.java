@@ -2,9 +2,11 @@ package com.yanye.springbootdemo.service;
 
 
 import com.yanye.springbootdemo.pojo.Page;
+import com.yanye.springbootdemo.pojo.Song;
 import com.yanye.springbootdemo.pojo.Student;
 import com.yanye.springbootdemo.pojo.User;
 
+import java.io.FileOutputStream;
 import java.util.List;
 
 public interface UserService {
@@ -31,4 +33,6 @@ public interface UserService {
     List<Student> selectWithPage(Page page);
 
     Integer getPageTotal();
+
+    Integer saveMusic(Song song);
 }

@@ -1,13 +1,10 @@
 package com.yanye.springbootdemo.controller;
 
-import com.yanye.springbootdemo.pojo.Page;
-import com.yanye.springbootdemo.pojo.Result;
-import com.yanye.springbootdemo.pojo.Student;
-import com.yanye.springbootdemo.pojo.User;
+import com.yanye.springbootdemo.pojo.*;
 import com.yanye.springbootdemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -95,12 +92,14 @@ public class UserController {
     }
 
     @GetMapping("/select")
-    public Result select(@RequestParam String username,String id) {
-        List<Student> list = userService.select(username, id);
-        if (list.isEmpty()){
+    public Result select(@RequestParam String id) {
+        Student stu = userService.findStuById(id);
+        if (stu == null){
             return Result.error("找不到用户");
         }
-        return Result.success(list);
+        List<Student> students = new ArrayList<>();
+        students.add(stu);
+        return Result.success(students);
     }
 
     @GetMapping("/select_with_page")
@@ -116,5 +115,14 @@ public class UserController {
         return Result.success(pageTotal);
     }
 
+    @PostMapping("/save")
+    public Result saveMusic(@RequestBody Song song) {
+        System.out.println(song);
+        Integer code = userService.saveMusic(song);
+        if (code == 0){
+            return Result.success("下载成功!");
+        }
+        return Result.error("下载失败!");
 
+    }
 }
